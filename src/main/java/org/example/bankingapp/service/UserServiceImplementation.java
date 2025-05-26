@@ -2,6 +2,7 @@ package org.example.bankingapp.service;
 
 import org.example.bankingapp.dto.AccountInfo;
 import org.example.bankingapp.dto.BankResponse;
+import org.example.bankingapp.dto.EmailDetails;
 import org.example.bankingapp.dto.UserRequest;
 import org.example.bankingapp.entity.User;
 import org.example.bankingapp.repository.UserRepository;
@@ -14,6 +15,8 @@ import java.math.BigDecimal;
 public class UserServiceImplementation implements UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+            private EmailService emailService;
     AccountUtils accountUtils;
     @Override
     public BankResponse createAccount(UserRequest userRequest) {
@@ -40,6 +43,17 @@ public class UserServiceImplementation implements UserService {
                 .accountNumber(AccountUtils.generateAccountNumber()) // Generate a unique account number
                 .build();
         User savedUser = userRepository.save(newUser);
+        // Send welcome email to the user
+        EmailDetails emailDetails=EmailDetails.builder()
+        .recipient(savedUser.getEmail())
+        .subject("Welcome to Our Banking App")
+        .messageBody("Dear " + savedUser.getFirstName() + ",\n\n" +
+                "Thank you for creating an account with us. Your account number is " + savedUser.getAccountNumber() + ".\n" +
+                "We are excited to have you on board!\n\n" +
+                "Best regards,\n" +
+                "The Banking App Team")
+        .build();
+        emailService.sendEmailAlert(emailDetails);
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_SUCCESS_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_SUCCESS_MESSAGE)
