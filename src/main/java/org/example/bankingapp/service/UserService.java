@@ -1,0 +1,10 @@
+package org.example.bankingapp.service;
+
+import org.example.bankingapp.dto.BankResponse;
+import org.example.bankingapp.dto.UserRequest;
+import org.springframework.stereotype.Service;
+
+
+public interface UserService {
+    BankResponse createAccount(UserRequest userRequest);
+}
